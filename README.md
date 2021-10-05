@@ -10,7 +10,7 @@ MIT License applies unless otherwise noted.
 
 Get a local instance running with `npm i` and then `npm run start`.
 
-Press `R` in game to see a tilesheet reference, press `R` again to return to the game. Press `Q` to show the debug layer.
+Press `x`to display or hide help/intro
 
 Contributions must be valid typescript & formatted with prettier.js.
 
