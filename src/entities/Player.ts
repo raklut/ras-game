@@ -1,12 +1,16 @@
 import Phaser from "phaser";
 import Graphics from "../assets/Graphics";
+import {Orientation} from "../includes/Orientation";
+import Bullet from "./Bullet"
+import Slime from "./Slime"
 
 const speed = 125;
-const attackSpeed = 500;
+const attackSpeed = 200;
 const attackDuration = 165;
 const staggerDuration = 200;
 const staggerSpeed = 100;
 const attackCooldown = attackDuration * 2;
+const maxlife = 100;
 
 interface Keys {
   up: Phaser.Input.Keyboard.Key;
@@ -19,6 +23,8 @@ interface Keys {
   s: Phaser.Input.Keyboard.Key;
   d: Phaser.Input.Keyboard.Key;
 }
+
+
 
 export default class Player {
   public sprite: Phaser.Physics.Arcade.Sprite;
@@ -35,6 +41,9 @@ export default class Player {
   private staggered: boolean;
   private scene: Phaser.Scene;
   private facingUp: boolean;
+  private isDying: boolean;
+  private isDead: boolean;
+  private orientation: Orientation;
 
   constructor(x: number, y: number, scene: Phaser.Scene) {
     this.scene = scene;
@@ -43,7 +52,10 @@ export default class Player {
     this.sprite.setOffset(20, 28);
     this.sprite.anims.play(Graphics.player.animations.idle.key);
     this.facingUp = false;
+    this.orientation = Orientation.DOWN;
     this.sprite.setDepth(5);
+    this.isDying = false;
+    this.isDead = false;
 
     this.keys = scene.input.keyboard.addKeys({
       up: Phaser.Input.Keyboard.KeyCodes.UP,
@@ -106,101 +118,128 @@ export default class Player {
     }
   }
 
+  die(): void {
+    this.isDying = true;
+  }
+
+  isPlayerDead(): boolean {
+    return this.isDead;
+  }
+
+  shoot(): void{
+    const bullet = new Bullet(this.scene, this, this.orientation);
+  }
+
   update(time: number) {
     this.time = time;
     const keys = this.keys;
     let attackAnim = "";
     let moveAnim = "";
 
-    if (this.staggered && !this.body.touching.none) {
-      this.staggerUntil = this.time + staggerDuration;
-      this.staggered = false;
+    if (!this.isDead) { //if dead we won't do anything
+      if (this.staggered && !this.body.touching.none) {
+        this.staggerUntil = this.time + staggerDuration;
+        this.staggered = false;
+
+        this.body.setVelocity(0);
+        if (this.body.touching.down) {
+          this.body.setVelocityY(-staggerSpeed);
+        } else if (this.body.touching.up) {
+          this.body.setVelocityY(staggerSpeed);
+        } else if (this.body.touching.left) {
+          this.body.setVelocityX(staggerSpeed);
+          this.sprite.setFlipX(true);
+        } else if (this.body.touching.right) {
+          this.body.setVelocityX(-staggerSpeed);
+          this.sprite.setFlipX(false);
+        }
+        this.sprite.anims.play(Graphics.player.animations.stagger.key);
+
+        this.flashEmitter.start();
+        // this.sprite.setBlendMode(Phaser.BlendModes.MULTIPLY);
+      }
+
+      if (time < this.attackUntil || time < this.staggerUntil) {
+        return;
+      }
 
       this.body.setVelocity(0);
-      if (this.body.touching.down) {
-        this.body.setVelocityY(-staggerSpeed);
-      } else if (this.body.touching.up) {
-        this.body.setVelocityY(staggerSpeed);
-      } else if (this.body.touching.left) {
-        this.body.setVelocityX(staggerSpeed);
+
+      const left = keys.left.isDown || keys.a.isDown;
+      const right = keys.right.isDown || keys.d.isDown;
+      const up = keys.up.isDown || keys.w.isDown;
+      const down = keys.down.isDown || keys.s.isDown;
+
+      if (!this.body.blocked.left && left) {
+        this.body.setVelocityX(-speed);
         this.sprite.setFlipX(true);
-      } else if (this.body.touching.right) {
-        this.body.setVelocityX(-staggerSpeed);
+      } else if (!this.body.blocked.right && right) {
+        this.body.setVelocityX(speed);
         this.sprite.setFlipX(false);
       }
-      this.sprite.anims.play(Graphics.player.animations.stagger.key);
 
-      this.flashEmitter.start();
-      // this.sprite.setBlendMode(Phaser.BlendModes.MULTIPLY);
-    }
+      if (!this.body.blocked.up && up) {
+        this.body.setVelocityY(-speed);
+      } else if (!this.body.blocked.down && down) {
+        this.body.setVelocityY(speed);
+      }
 
-    if (time < this.attackUntil || time < this.staggerUntil) {
-      return;
-    }
+      if (left || right) {
+        moveAnim = Graphics.player.animations.walk.key;
+        attackAnim = Graphics.player.animations.slash.key;
+        this.facingUp = false;
+        if (left) {
+          this.orientation = Orientation.LEFT;
+        } else {
+          this.orientation = Orientation.RIGHT;
+        }
+      } else if (down) {
+        moveAnim = Graphics.player.animations.walk.key;
+        attackAnim = Graphics.player.animations.slashDown.key;
+        this.facingUp = false;
+        this.orientation = Orientation.DOWN;
+      } else if (up) {
+        moveAnim = Graphics.player.animations.walkBack.key;
+        attackAnim = Graphics.player.animations.slashUp.key;
+        this.facingUp = true;
+        this.orientation = Orientation.UP;
+      } else if (this.facingUp) {
+        moveAnim = Graphics.player.animations.idleBack.key;
+      } else {
+        moveAnim = Graphics.player.animations.idle.key;
+      }
 
-    this.body.setVelocity(0);
-
-    const left = keys.left.isDown || keys.a.isDown;
-    const right = keys.right.isDown || keys.d.isDown;
-    const up = keys.up.isDown || keys.w.isDown;
-    const down = keys.down.isDown || keys.s.isDown;
-
-    if (!this.body.blocked.left && left) {
-      this.body.setVelocityX(-speed);
-      this.sprite.setFlipX(true);
-    } else if (!this.body.blocked.right && right) {
-      this.body.setVelocityX(speed);
-      this.sprite.setFlipX(false);
-    }
-
-    if (!this.body.blocked.up && up) {
-      this.body.setVelocityY(-speed);
-    } else if (!this.body.blocked.down && down) {
-      this.body.setVelocityY(speed);
-    }
-
-    if (left || right) {
-      moveAnim = Graphics.player.animations.walk.key;
-      attackAnim = Graphics.player.animations.slash.key;
-      this.facingUp = false;
-    } else if (down) {
-      moveAnim = Graphics.player.animations.walk.key;
-      attackAnim = Graphics.player.animations.slashDown.key;
-      this.facingUp = false;
-    } else if (up) {
-      moveAnim = Graphics.player.animations.walkBack.key;
-      attackAnim = Graphics.player.animations.slashUp.key;
-      this.facingUp = true;
-    } else if (this.facingUp) {
-      moveAnim = Graphics.player.animations.idleBack.key;
-    } else {
-      moveAnim = Graphics.player.animations.idle.key;
-    }
-
-    if (
-      keys.space!.isDown &&
-      time > this.attackLockedUntil &&
-      this.body.velocity.length() > 0
-    ) {
-      this.attackUntil = time + attackDuration;
-      this.attackLockedUntil = time + attackDuration + attackCooldown;
-      this.body.velocity.normalize().scale(attackSpeed);
-      this.sprite.anims.play(attackAnim, true);
-      this.emitter.start();
-      this.sprite.setBlendMode(Phaser.BlendModes.ADD);
-      this.attacking = true;
-      return;
-    }
-
-    this.attacking = false;
-    this.sprite.anims.play(moveAnim, true);
-    this.body.velocity.normalize().scale(speed);
-    this.sprite.setBlendMode(Phaser.BlendModes.NORMAL);
-    if (this.emitter.on) {
-      this.emitter.stop();
-    }
-    if (this.flashEmitter.on) {
-      this.flashEmitter.stop();
+      if (
+        keys.space!.isDown &&
+        time > this.attackLockedUntil &&
+        this.body.velocity.length() > 0
+      ) {
+        this.attackUntil = time + attackDuration;
+        this.attackLockedUntil = time + attackDuration + attackCooldown;
+        //this.body.velocity.normalize().scale(attackSpeed);
+        this.sprite.anims.play(attackAnim, true);
+        this.shoot();
+        //this.emitter.start();
+        //this.sprite.setBlendMode(Phaser.BlendModes.ADD);
+        this.attacking = true;
+        return;
+      }
+      if (this.isDying) {
+        moveAnim = Graphics.player.animations.die.key;
+        this.isDead = true;
+      }
+      this.attacking = false;
+      this.sprite.anims.play(moveAnim, true);
+      this.body.velocity.normalize().scale(speed);
+      this.sprite.setBlendMode(Phaser.BlendModes.NORMAL);
+      if (this.emitter.on) {
+        this.emitter.stop();
+      }
+      if (this.flashEmitter.on) {
+        this.flashEmitter.stop();
+      }
+    } else { //if (!this.isDead) {
+      this.body.setVelocity(0);
     }
   }
 }

@@ -1,6 +1,7 @@
 import Dungeoneer from "dungeoneer";
 import Tile, { TileType } from "./Tile";
 import Slime from "./Slime";
+import Bullet from "./Bullet"
 import Graphics from "../assets/Graphics";
 import DungeonScene from "../scenes/DungeonScene";
 
@@ -151,13 +152,21 @@ export default class Map {
     this.doorLayer.setTileIndexCallback(
       collidableDoors,
       (_: unknown, tile: Phaser.Tilemaps.Tile) => {
-        this.doorLayer.putTileAt(
-          Graphics.environment.indices.doors.destroyed,
-          tile.x,
-          tile.y
-        );
-        this.tileAt(tile.x, tile.y)!.open();
-        scene.fov!.recalculate();
+        // Only let bullet destroy doors, comment if any sprite
+        // (Player, slime,...) shall be able to destroy them
+        if ( _ instanceof Bullet )  {
+          _.destroy(); // destroy the bullet as well
+
+          { // destroy door
+            this.doorLayer.putTileAt(
+              Graphics.environment.indices.doors.destroyed,
+              tile.x,
+              tile.y
+            );
+            this.tileAt(tile.x, tile.y)!.open();
+            scene.fov!.recalculate();
+          }
+        }
       },
       this
     );

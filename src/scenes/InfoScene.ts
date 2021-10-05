@@ -14,7 +14,10 @@ export default class InfoScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.text = this.add.dynamicBitmapText(25, 25, "default", "", 12);
+    this.text = this.add.dynamicBitmapText(
+       25,
+       75,
+       "default", "", 12);
     this.text.setAlpha(0.7);
     this.lastUpdate = 0;
   }
@@ -22,16 +25,23 @@ export default class InfoScene extends Phaser.Scene {
   update(time: number, _: number): void {
     if (time > this.lastUpdate! + 100) {
       this.text!.setText([
-        "Dungeon Dash!",
+        "Bienvenue a toi arpenteur!",
         "",
-        "Use arrow keys to walk around the map!",
-        "Press space while moving to dash-attack!",
-        "(debug: Q, tilesets: R)",
+        "Sera tu capable de retrouver ce que",
+        "la Undersurvival company a laisse ",
+        "derriere elle ?",
+        "",  
+        "Mais avant ca nettoie moi un peu",
+        "le coin, j'ai cru voir bouger",
+        "quelque chose dans l'ombre...",
         "",
-        "Credits & more information at",
-        "https://github.com/mipearson/dungeondash",
+        "Commandes :",
+        "  Direction : deplacement",
+        "  Espace + direction : tir",
         "",
-        "FPS: " + Math.round(this.game.loop.actualFps)
+        "\(Appuie sur X pour masquer\)",
+        "",
+        //"FPS: " + Math.round(this.game.loop.actualFps)
       ]);
       this.lastUpdate = time;
     }

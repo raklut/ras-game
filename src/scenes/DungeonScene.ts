@@ -4,23 +4,34 @@ import FOVLayer from "../entities/FOVLayer";
 import Player from "../entities/Player";
 import Slime from "../entities/Slime";
 import Map from "../entities/Map";
+import eventsCenter from "../entities/EventsCenter"
+import Bullet from "../entities/Bullet"
+
 
 const worldTileHeight = 81;
 const worldTileWidth = 81;
+
+
 
 export default class DungeonScene extends Phaser.Scene {
   lastX: number;
   lastY: number;
   player: Player | null;
+
   slimes: Slime[];
   slimeGroup: Phaser.GameObjects.Group | null;
   fov: FOVLayer | null;
   tilemap: Phaser.Tilemaps.Tilemap | null;
+  map: Map | null;
   roomDebugGraphics?: Phaser.GameObjects.Graphics;
+
+
 
   preload(): void {
     this.load.image(Graphics.environment.name, Graphics.environment.file);
     this.load.image(Graphics.util.name, Graphics.util.file);
+    this.load.image(Graphics.bullet.name, Graphics.bullet.file);
+    
     this.load.spritesheet(Graphics.player.name, Graphics.player.file, {
       frameHeight: Graphics.player.height,
       frameWidth: Graphics.player.width
@@ -40,6 +51,7 @@ export default class DungeonScene extends Phaser.Scene {
     this.tilemap = null;
     this.slimes = [];
     this.slimeGroup = null;
+    this.map = null;
   }
 
   slimePlayerCollide(
@@ -57,6 +69,8 @@ export default class DungeonScene extends Phaser.Scene {
       slime.kill();
       return false;
     } else {
+      // took some damage
+      eventsCenter.emit( 'damage-count', slime.getDamage() );
       this.player!.stagger();
       return true;
     }
@@ -93,6 +107,7 @@ export default class DungeonScene extends Phaser.Scene {
     });
 
     const map = new Map(worldTileWidth, worldTileHeight, this);
+    this.map = map;
     this.tilemap = map.tilemap;
 
     this.fov = new FOVLayer(map);
@@ -142,23 +157,23 @@ export default class DungeonScene extends Phaser.Scene {
     // }
 
     this.input.keyboard.on("keydown_R", () => {
-      this.scene.stop("InfoScene");
-      this.scene.run("ReferenceScene");
-      this.scene.sleep();
+      //this.scene.stop("InfoScene");
+      //this.scene.run("ReferenceScene");
+      //this.scene.sleep();
     });
 
     this.input.keyboard.on("keydown_Q", () => {
-      this.physics.world.drawDebug = !this.physics.world.drawDebug;
-      if (!this.physics.world.debugGraphic) {
-        this.physics.world.createDebugGraphic();
-      }
-      this.physics.world.debugGraphic.clear();
-      this.roomDebugGraphics!.setVisible(this.physics.world.drawDebug);
+    //  this.physics.world.drawDebug = !this.physics.world.drawDebug;
+    //  if (!this.physics.world.debugGraphic) {
+    //    this.physics.world.createDebugGraphic();
+    //  }
+    //  this.physics.world.debugGraphic.clear();
+    //  this.roomDebugGraphics!.setVisible(this.physics.world.drawDebug);
     });
 
-    this.input.keyboard.on("keydown_F", () => {
-      this.fov!.layer.setVisible(!this.fov!.layer.visible);
-    });
+//    this.input.keyboard.on("keydown_F", () => {
+//      this.fov!.layer.setVisible(!this.fov!.layer.visible);
+//    });
 
     this.roomDebugGraphics = this.add.graphics({ x: 0, y: 0 });
     this.roomDebugGraphics.setVisible(false);
@@ -171,17 +186,40 @@ export default class DungeonScene extends Phaser.Scene {
         this.tilemap!.tileToWorldY(room.height)
       );
     }
-
     this.scene.run("InfoScene");
+
+    this.input.keyboard.on("keydown_X", () => {
+      if (this.scene.isActive("InfoScene")) {
+        this.scene.stop("InfoScene");
+      } else {
+        this.scene.run("InfoScene");
+      }
+    });
+
+    eventsCenter.on('player-die', this.playerdie, this)
+    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+      this.scene.start('GameOverScene')
+    })
+
+
+    this.scene.run("StatScene");
+  }
+
+  playerdie() : void {
+    this.player.die();
+    this.cameras.main.fadeOut(2000, 0, 0, 0);
   }
 
   update(time: number, delta: number) {
     this.player!.update(time);
 
+
     const camera = this.cameras.main;
 
     for (let slime of this.slimes) {
-      slime.update(time);
+      if(slime.isAlive()) {
+        slime.update(time);
+      }
     }
 
     const player = new Phaser.Math.Vector2({
@@ -197,5 +235,12 @@ export default class DungeonScene extends Phaser.Scene {
     );
 
     this.fov!.update(player, bounds, delta);
+
+    if (this.player.isPlayerDead()) {
+      //this.scene.stop("DungeonScene");
+      this.scene.stop("StatScene");
+      this.scene.stop("InfoScene");
+      //this.scene.start("GameOverScene");
+    }
   }
 }

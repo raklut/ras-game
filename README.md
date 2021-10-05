@@ -2,7 +2,7 @@
 
 An experiment with making a dungeon crawler with Open Source or public domain assets, using Phaser 3 & Typescript.
 
-Live demo available at https://dungeon-dash.surge.sh
+Live demo available at https://ras-game.surge.sh
 
 MIT License applies unless otherwise noted.
 
@@ -18,7 +18,10 @@ Otherwise, go nuts.
 
 ## TODO
 
- * use `PerformanceObserver` to get a more accurate FPS value
+ * Add control for mobile users
+ * Add multiple levels
+ * Add boss
+ * Inventory ?
 
 ## Credits
 
@@ -26,3 +29,4 @@ Otherwise, go nuts.
 * Uses [dungeoneer](https://www.npmjs.com/package/dungeoneer) to generate the dungeon
 * `Rogue*.png` files are from the [Rogue Dungeon Tileset 16x16](https://fongoose.itch.io/rogue-dungeon-tileset-16x16) by [fongoose](https://twitter.com/fongoosemike)
 * "CasualEncounter" font from Anna Anthropy's [World of Fonts](https://w.itch.io/world-of-fonts)
+* [Dongeon Dash](https://github.com/mipearson/dungeondash) base implementation : Michael Pearson & Others

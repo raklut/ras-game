@@ -3,8 +3,8 @@ import Map from "../entities/Map";
 import { Mrpas } from "mrpas";
 import Phaser from "phaser";
 
-const radius = 7;
-const fogAlpha = 0.8;
+const radius = 6;
+const fogAlpha = 0.9;
 
 const lightDropoff = [0.7, 0.6, 0.3, 0.1];
 

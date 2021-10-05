@@ -1,7 +1,10 @@
 import RogueEnvironment from "../../assets/fongoose/RogueEnvironment16x16-extruded.png";
-import RoguePlayer from "../../assets/fongoose/RoguePlayer_48x48.png";
+import RoguePlayer from "../../assets/fongoose/RoguePlayer_ras_48x48.png";
 import RogueSlime from "../../assets/fongoose/RogueSlime32x32.png";
 import RogueItems from "../../assets/fongoose/RogueItems16x16.png";
+import HeartFile from "../../assets/fongoose/heart48.png";
+import EmptyHeartFile from "../../assets/fongoose/empty_heart48.png";
+import BulletFile from "../../assets/fongoose/bullet.png";
 
 import Util from "../../assets/Util.png";
 
@@ -128,6 +131,11 @@ const player: AnimSet = {
       frames: { frames: [0x38, 0x38, 0x39, 0x3a] },
       frameRate: 30
     }
+    die: {
+      key: "playerDie",
+      frames: { frames: [0x50, 0x50, 0x51, 0x52, 0x53, 0x54] },
+      frameRate: 4
+    }
   }
 };
 
@@ -158,6 +166,39 @@ const slime: AnimSet = {
   }
 };
 
+const heart = {
+  name: "heart",
+  width: 48,
+  height: 48,
+  file: HeartFile
+  //,
+  //indices: {
+  //  full: 0x00
+  //}
+};
+
+const bullet = {
+  name: "bullet",
+  width: 13,
+  height: 37,
+  file: BulletFile
+  //,
+  //indices: {
+  //  full: 0x00
+  //}
+};
+
+const empty_heart = {
+  name: "empty_heart",
+  width: 48,
+  height: 48,
+  file: EmptyHeartFile
+  //,
+  //indices: {
+  //  full: 0x00
+  //}
+};
+
 const items = {
   name: "items",
   width: 16,
@@ -180,5 +221,8 @@ export default {
   player,
   slime,
   items,
+  heart,
+  empty_heart,
+  bullet,
   util
 };
