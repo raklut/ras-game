@@ -12,6 +12,7 @@ const staggerSpeed = 100;
 const attackCooldown = attackDuration * 2;
 const maxlife = 100;
 
+/*
 interface Keys {
   up: Phaser.Input.Keyboard.Key;
   down: Phaser.Input.Keyboard.Key;
@@ -23,7 +24,7 @@ interface Keys {
   s: Phaser.Input.Keyboard.Key;
   d: Phaser.Input.Keyboard.Key;
 }
-
+*/
 
 
 export default class Player {
@@ -56,6 +57,19 @@ export default class Player {
     this.sprite.setDepth(5);
     this.isDying = false;
     this.isDead = false;
+
+    this.keys = scene.input.keyboard.addKeys({
+      up: Phaser.Input.Keyboard.KeyCodes.UP,
+      down: Phaser.Input.Keyboard.KeyCodes.DOWN,
+      left: Phaser.Input.Keyboard.KeyCodes.LEFT,
+      right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+      space: Phaser.Input.Keyboard.KeyCodes.SPACE,
+      w: "w",
+      a: "a",
+      s: "s",
+      d: "d"
+    }) as Keys;
+
 
     this.keys = scene.input.keyboard.addKeys({
       up: Phaser.Input.Keyboard.KeyCodes.UP,
@@ -157,7 +171,7 @@ export default class Player {
 
         this.flashEmitter.start();
         // this.sprite.setBlendMode(Phaser.BlendModes.MULTIPLY);
-      }
+      } 
 
       if (time < this.attackUntil || time < this.staggerUntil) {
         return;

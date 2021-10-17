@@ -6,12 +6,6 @@ import HealthBar from "../entities/HealthBar";
 import eventsCenter from "../entities/EventsCenter"
 import VirtGamePad from "../plugins/VirtGamePad"
 
-const heathbar_posx = 50;//this.cameras.main.worldView.x + 3*this.cameras.main.width/4;
-const heathbar_posy = 50;
-
-const guesswords_posx = 200;
-const guesswords_posy = 32;
-
 
 export default class MobileUI extends Phaser.Scene {
   gamepad: VirtGamePad | null;
@@ -19,11 +13,14 @@ export default class MobileUI extends Phaser.Scene {
   constructor() {
     super({ key: "MobileUI" });
     this.gamepad = null;
+    this.emitter = null;
+    this.keyY = null;
   }
 
   preload(): void {
     // Load the gamepad spritesheet. Note that the width must equal height
     // of the sprite.
+    console.log("mobi")
     this.load.image(Graphics.gamepadUI.BtnUp.name, Graphics.gamepadUI.BtnUp.file);
     this.load.image(Graphics.gamepadUI.BtnDown.name, Graphics.gamepadUI.BtnDown.file);
     this.load.image(Graphics.gamepadUI.PadOut.name, Graphics.gamepadUI.PadOut.file);
@@ -32,6 +29,7 @@ export default class MobileUI extends Phaser.Scene {
   }
 
   create(): void {
+    this.emitter = new Phaser.Events.EventEmitter();
     this.joystick = this.gamepad.addJoystick(
         100, 
         this.cameras.main.worldView.y + this.cameras.main.height-200,
@@ -41,10 +39,18 @@ export default class MobileUI extends Phaser.Scene {
       this.cameras.main.worldView.x + this.cameras.main.width-100,
       this.cameras.main.worldView.y + this.cameras.main.height-200,
        1.0, [Graphics.gamepadUI.BtnUp.name]);
+    Phaser.Input.Keyboard.KeyboardManager.enabled=true;
+    this.keyY = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Y);
+    this.input.keyboard.on("keydown-X", function(event) {
+      console.log("x pressed");
+    });
   }
 
   update(time: number, _: number): void {
-    
+    if(this.keyY.isDown) {
+      this.scene.get("DungeonScene").input.keyboard.emit('keydown-X');
+      console.log("y key pressed");
+    }
   }
 
 

@@ -77,6 +77,8 @@ export default class DungeonScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.input.enabled = true;
+
     this.events.on("wake", () => {
       this.scene.run("InfoScene");
     });
@@ -156,24 +158,24 @@ export default class DungeonScene extends Phaser.Scene {
     //   this.physics.add.collider(slime.sprite, map.wallLayer);
     // }
 
-    this.input.keyboard.on("keydown_R", () => {
+    this.input.keyboard.on("keydown-R", function(event) {
       //this.scene.stop("InfoScene");
       //this.scene.run("ReferenceScene");
       //this.scene.sleep();
-    });
+    }, this);
 
-    this.input.keyboard.on("keydown_Q", () => {
+    this.input.keyboard.on("keydown-Q", function(event) {
     //  this.physics.world.drawDebug = !this.physics.world.drawDebug;
     //  if (!this.physics.world.debugGraphic) {
     //    this.physics.world.createDebugGraphic();
     //  }
     //  this.physics.world.debugGraphic.clear();
     //  this.roomDebugGraphics!.setVisible(this.physics.world.drawDebug);
-    });
+    }, this);
 
-//    this.input.keyboard.on("keydown_F", () => {
+//    this.input.keyboard.on("keydown-F", function(event) {
 //      this.fov!.layer.setVisible(!this.fov!.layer.visible);
-//    });
+//    }, this);
 
     this.roomDebugGraphics = this.add.graphics({ x: 0, y: 0 });
     this.roomDebugGraphics.setVisible(false);
@@ -188,13 +190,13 @@ export default class DungeonScene extends Phaser.Scene {
     }
     this.scene.run("InfoScene");
 
-    this.input.keyboard.on("keydown_X", () => {
+    this.input.keyboard.on("keydown-X", function(event) {
       if (this.scene.isActive("InfoScene")) {
         this.scene.stop("InfoScene");
       } else {
         this.scene.run("InfoScene");
       }
-    });
+    }, this);
 
     eventsCenter.on('player-die', this.playerdie, this)
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
@@ -203,6 +205,7 @@ export default class DungeonScene extends Phaser.Scene {
 
 
     this.scene.run("StatScene");
+    this.scene.run("MobileUI");
   }
 
   playerdie() : void {

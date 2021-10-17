@@ -23,6 +23,7 @@ var VirtGamePad = function (scene)
     console.log('VirtGamePad owned by scene ' + scene.scene.key );
     this.scene = scene;
     this.systems = scene.sys;
+    this.name = "VirtGamePad";
 
     // Class members
     this.input = null;//this.scene.input;
@@ -113,9 +114,29 @@ VirtGamePad.prototype = {
         //this.joystickPad.anchor.set(0.5);
         //this.joystickPad.fixedToCamera = true;
         this.joystickPad.setScale(scale, scale);
+        this.joystickPoint = new Phaser.Geom.Point(x, y);
+
+        this.joystick.setInteractive({ draggable: true });
+        this.joystick.on('dragstart', 
+            function (pointer, gameObject) {
+                //console.log('dragstart');
+            }
+        , this);
+        this.joystick.on('drag', 
+            function (pointer,dragX,dragY, gameObject ) {
+                this.testDistance(pointer,this);
+            }
+        , this);
+        this.joystick.on('dragend', 
+            function (pointer, gameObject, dropped ) {
+                //pointer.position = Phaser.Geom.Point(gameObject.x, gameObject.y);
+                //this.testDistance(this.joystickPoint,this);
+                this.moveJoystick(this.joystickPoint,this)
+            }
+        , this);
         
         // Remember the coordinates of the joystick
-        this.joystickPoint = new Phaser.Geom.Point(x, y);
+        
         
         // Set up initial joystick properties
         this.joystick.properties = {
@@ -152,12 +173,14 @@ VirtGamePad.prototype = {
         //this.button = this.game.add.button(x, y, key, null, this);
         
         this.button = this.scene.add.image(x, y, this.buttonmap[0]);
-
+        
         //this.button.frame = 0;
         this.button.setOrigin(0.5);
         //this.button.fixedToCamera = true;
         this.button.setScale(this.buttonscale, this.buttonscale);
         
+        this.button.setInteractive().on('pointerdown' , this.buttonDown);
+
         // Remember the coordinates of the button
         this.buttonPoint = new Phaser.Geom.Point(x, y);
         
@@ -171,41 +194,13 @@ VirtGamePad.prototype = {
     },
     buttonDown: function() {
         this.buttonisDown = true;
+        this.scene.input.keyboard.emit('keydown-SPACE');
         console.log('shoot');
     },
     buttonUp: function() {
         this.buttonisDown = false;
     },
-    gamepadPoll: function() {
-        
-        var resetJoystick = true;
-        /*
-        //// See if any pointers are in range of the joystick or buttons
-        if (this.button != null) {
-	        this.buttonisDown = false;
-        }
-        if (this.joystick != null) {  	
-	        this.scene.game.input.pointers.forEach(function(p) {
-	            resetJoystick = this.testDistance(p, this);
-	        }, this);
-	        
-	        // See if the mouse pointer is in range of the joystick or buttons
-	        resetJoystick = this.testDistance(this.scene.input.mousePointer, this);
-	        
-	        // If the pointer is removed, reset the joystick
-	        if (resetJoystick) {
-	            if ((this.joystickPointer === null) || 
-	                (this.joystickPointer.isUp)) {
-	                this.moveJoystick(this.joystickPoint, this);
-	                //this.joystick.properties.inUse = false;
-	                this.joystickPointer = null;
-	                this.joystick.x = this.joystickPoint.x
-	                this.joystick.y = this.joystickPoint.y
-	            }
-	        }
-        }
-        */
-    },
+
     testDistance: function(pointer, that) {
     
         var reset = true;
@@ -219,15 +214,6 @@ VirtGamePad.prototype = {
             that.joystickPointer = pointer;
             this.moveJoystick(pointer.position, that);
         }
-        
-        // See if the pointer is over the button
-        d = Phaser.Math.Distance.BetweenPoints(that.buttonPoint, pointer.position); //that.buttonPoint.distance(pointer.position);
-        if ((pointer.isDown) && (d < that.buttonRadius)) {
-            this.buttonDown();
-        } else {
-        	this.buttonUp();
-        }
-        
         return reset;
     },
     moveJoystick: function(point, that) {
@@ -290,13 +276,18 @@ VirtGamePad.prototype = {
         }
         if (that.joystick.properties.up) {
         	this.scene.input.keyboard.emit('keydown-UP');
+        
         	console.log("up");
         }
         if (that.joystick.properties.right) {
 
-        	this.scene.scene.get("DungeonScene").input.keyboard.emit('keydown-X');
+        	this.scene.scene.get("DungeonScene").input.keyboard.emit('keydown-RIGHT');
         	console.log("right");
-        	this.scene.scene.get("DungeonScene").input.keyboard.emit('keyup-X');
+        	//this.scene.scene.get("DungeonScene").input.keyboard.emit('keyup-X');
+        }
+        if (that.joystick.properties.down) {
+            this.scene.input.keyboard.emit('keydown-DOWN');
+            console.log("down");
         }
     },
     //  A test method.
@@ -328,7 +319,6 @@ VirtGamePad.prototype = {
     //  Called every Scene step - phase 3
     postUpdate: function (time, delta)
     {
-    	this.gamepadPoll();
     },
 
     //  Called when a Scene is paused. A paused scene doesn't have its Step run, but still renders.

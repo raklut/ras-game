@@ -3,11 +3,9 @@ import ReferenceScene from "./scenes/ReferenceScene";
 import DungeonScene from "./scenes/DungeonScene";
 import InfoScene from "./scenes/InfoScene";
 import StatScene from "./scenes/StatScene";
-//import MobileUI from "./scenes/MobileUI";
+import MobileUI from "./scenes/MobileUI";
 import GameOverScene from "./scenes/GameOverScene"
-// import SceneWatcherPlugin from "phaser-plugin-scene-watcher";
-//import VirtualGamepad from "./plugins/phaser-plugin-virtual-gamepad"
-//import VirtGamePad from "./plugins/VirtGamePad"
+import VirtGamePad from "./plugins/VirtGamePad"
 
 var config = {
   type: Phaser.WEBGL,
@@ -16,7 +14,7 @@ var config = {
   render: { pixelArt: true },
   physics: { default: "arcade", arcade: { debug: false, gravity: { y: 0 } } },
   scene: [DungeonScene, InfoScene, ReferenceScene, StatScene,
-           //MobileUI ,
+           MobileUI ,
            GameOverScene],
   scale: {
     mode: Phaser.Scale.RESIZE
