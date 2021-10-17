@@ -180,6 +180,7 @@ VirtGamePad.prototype = {
         this.button.setScale(this.buttonscale, this.buttonscale);
         
         this.button.setInteractive().on('pointerdown' , this.buttonDown);
+        this.button.setInteractive().on('pointerup' , this.buttonUp);
 
         // Remember the coordinates of the button
         this.buttonPoint = new Phaser.Geom.Point(x, y);
@@ -194,11 +195,11 @@ VirtGamePad.prototype = {
     },
     buttonDown: function() {
         this.buttonisDown = true;
-        this.scene.input.keyboard.emit('keydown-SPACE');
-        console.log('shoot');
+        this.scene.scene.get("DungeonScene").input.keyboard.emit('keydown-SPACE');
     },
     buttonUp: function() {
         this.buttonisDown = false;
+        this.scene.scene.get("DungeonScene").input.keyboard.emit('keyup-SPACE');
     },
 
     testDistance: function(pointer, that) {
@@ -271,23 +272,25 @@ VirtGamePad.prototype = {
         this.joystick.y = that.joystickPoint.y + deltaY;
 
         if (that.joystick.properties.left) {
-        	this.scene.input.keyboard.emit('keydown-LEFT');
-        	console.log("left");
+        	this.scene.scene.get("DungeonScene").input.keyboard.emit('keydown-LEFT');
+        } else {
+            this.scene.scene.get("DungeonScene").input.keyboard.emit('keyup-LEFT');
         }
+
         if (that.joystick.properties.up) {
-        	this.scene.input.keyboard.emit('keydown-UP');
-        
-        	console.log("up");
+        	this.scene.scene.get("DungeonScene").input.keyboard.emit('keydown-UP');
+        } else {
+            this.scene.scene.get("DungeonScene").input.keyboard.emit('keyup-UP');
         }
         if (that.joystick.properties.right) {
-
-        	this.scene.scene.get("DungeonScene").input.keyboard.emit('keydown-RIGHT');
-        	console.log("right");
-        	//this.scene.scene.get("DungeonScene").input.keyboard.emit('keyup-X');
+            this.scene.scene.get("DungeonScene").input.keyboard.emit('keydown-RIGHT');
+        } else {
+            this.scene.scene.get("DungeonScene").input.keyboard.emit('keyup-RIGHT');
         }
         if (that.joystick.properties.down) {
-            this.scene.input.keyboard.emit('keydown-DOWN');
-            console.log("down");
+            this.scene.scene.get("DungeonScene").input.keyboard.emit('keydown-DOWN');
+        } else {
+            this.scene.scene.get("DungeonScene").input.keyboard.emit('keyup-DOWN');
         }
     },
     //  A test method.

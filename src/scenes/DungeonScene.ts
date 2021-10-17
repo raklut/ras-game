@@ -190,17 +190,17 @@ export default class DungeonScene extends Phaser.Scene {
     }
     this.scene.run("InfoScene");
 
-    this.input.keyboard.on("keydown-X", function(event) {
-      if (this.scene.isActive("InfoScene")) {
+    this.input.keyboard.on("keydown-SPACE", function(event) {
+//      if (this.scene.isActive("InfoScene")) {
         this.scene.stop("InfoScene");
-      } else {
-        this.scene.run("InfoScene");
-      }
+//      } else {
+//        this.scene.run("InfoScene");
+//      }
     }, this);
 
     eventsCenter.on('player-die', this.playerdie, this)
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-      this.scene.start('GameOverScene')
+      this.scene.start('GameOverScene');
     })
 
 

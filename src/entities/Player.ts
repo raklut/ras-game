@@ -29,7 +29,7 @@ interface Keys {
 
 export default class Player {
   public sprite: Phaser.Physics.Arcade.Sprite;
-  private keys: Keys;
+  //private keys: Keys;
 
   private attackUntil: number;
   private staggerUntil: number;
@@ -45,6 +45,12 @@ export default class Player {
   private isDying: boolean;
   private isDead: boolean;
   private orientation: Orientation;
+  private moveUp: boolean;
+  private moveDown: boolean;
+  private moveLeft: boolean;
+  private moveRight: boolean;
+  private actAttack: boolean;
+
 
   constructor(x: number, y: number, scene: Phaser.Scene) {
     this.scene = scene;
@@ -57,31 +63,36 @@ export default class Player {
     this.sprite.setDepth(5);
     this.isDying = false;
     this.isDead = false;
+    this.moveUp = false;
+    this.moveDown = false;
+    this.moveLeft = false;
+    this.moveRight = false;
+    this.actAttack = false;
 
-    this.keys = scene.input.keyboard.addKeys({
-      up: Phaser.Input.Keyboard.KeyCodes.UP,
-      down: Phaser.Input.Keyboard.KeyCodes.DOWN,
-      left: Phaser.Input.Keyboard.KeyCodes.LEFT,
-      right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-      space: Phaser.Input.Keyboard.KeyCodes.SPACE,
-      w: "w",
-      a: "a",
-      s: "s",
-      d: "d"
-    }) as Keys;
+    //this.keys = scene.input.keyboard.addKeys({
+    //  up: Phaser.Input.Keyboard.KeyCodes.UP,
+    //  down: Phaser.Input.Keyboard.KeyCodes.DOWN,
+    //  left: Phaser.Input.Keyboard.KeyCodes.LEFT,
+    //  right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+    //  space: Phaser.Input.Keyboard.KeyCodes.SPACE,
+    //  w: "w",
+    //  a: "a",
+    //  s: "s",
+    //  d: "d"
+    //}) as Keys;
 
 
-    this.keys = scene.input.keyboard.addKeys({
-      up: Phaser.Input.Keyboard.KeyCodes.UP,
-      down: Phaser.Input.Keyboard.KeyCodes.DOWN,
-      left: Phaser.Input.Keyboard.KeyCodes.LEFT,
-      right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-      space: Phaser.Input.Keyboard.KeyCodes.SPACE,
-      w: "w",
-      a: "a",
-      s: "s",
-      d: "d"
-    }) as Keys;
+    //this.keys = scene.input.keyboard.addKeys({
+    //  up: Phaser.Input.Keyboard.KeyCodes.UP,
+    //  down: Phaser.Input.Keyboard.KeyCodes.DOWN,
+    //  left: Phaser.Input.Keyboard.KeyCodes.LEFT,
+    //  right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+    //  space: Phaser.Input.Keyboard.KeyCodes.SPACE,
+    //  w: "w",
+    //  a: "a",
+    //  s: "s",
+    //  d: "d"
+    //}) as Keys;
 
     this.attackUntil = 0;
     this.attackLockedUntil = 0;
@@ -117,6 +128,39 @@ export default class Player {
 
     this.body = <Phaser.Physics.Arcade.Body>this.sprite.body;
     this.time = 0;
+
+    // Key handling
+
+    this.scene.input.keyboard.on("keydown-UP", function(event) {
+      this.moveUp = true;
+    }, this);
+    this.scene.input.keyboard.on("keyup-UP", function(event) {
+      this.moveUp = false;
+    }, this);
+    this.scene.input.keyboard.on("keydown-DOWN", function(event) {
+      this.moveDown = true;
+    }, this);
+    this.scene.input.keyboard.on("keyup-DOWN", function(event) {
+      this.moveDown = false;
+    }, this);
+    this.scene.input.keyboard.on("keydown-LEFT", function(event) {
+      this.moveLeft = true;
+    }, this);
+    this.scene.input.keyboard.on("keyup-LEFT", function(event) {
+      this.moveLeft = false;
+    }, this);
+    this.scene.input.keyboard.on("keydown-RIGHT", function(event) {
+      this.moveRight = true;
+    }, this);
+    this.scene.input.keyboard.on("keyup-RIGHT", function(event) {
+      this.moveRight = false;
+    }, this);
+    this.scene.input.keyboard.on("keydown-SPACE", function(event) {
+      this.actAttack = true;
+    }, this);
+    this.scene.input.keyboard.on("keyup-SPACE", function(event) {
+      this.actAttack = false;
+    }, this);        
   }
 
   isAttacking(): boolean {
@@ -146,7 +190,7 @@ export default class Player {
 
   update(time: number) {
     this.time = time;
-    const keys = this.keys;
+    //const keys = this.keys;
     let attackAnim = "";
     let moveAnim = "";
 
@@ -179,10 +223,10 @@ export default class Player {
 
       this.body.setVelocity(0);
 
-      const left = keys.left.isDown || keys.a.isDown;
-      const right = keys.right.isDown || keys.d.isDown;
-      const up = keys.up.isDown || keys.w.isDown;
-      const down = keys.down.isDown || keys.s.isDown;
+      const left = this.moveLeft;//keys.left.isDown || keys.a.isDown;
+      const right = this.moveRight;//keys.right.isDown || keys.d.isDown;
+      const up = this.moveUp;//keys.up.isDown || keys.w.isDown;
+      const down = this.moveDown;//keys.down.isDown || keys.s.isDown;
 
       if (!this.body.blocked.left && left) {
         this.body.setVelocityX(-speed);
@@ -224,13 +268,22 @@ export default class Player {
       }
 
       if (
-        keys.space!.isDown &&
-        time > this.attackLockedUntil &&
-        this.body.velocity.length() > 0
+        this.actAttack &&
+        time > this.attackLockedUntil// &&
+        //this.body.velocity.length() > 0
       ) {
+        console.log("attacking");
         this.attackUntil = time + attackDuration;
         this.attackLockedUntil = time + attackDuration + attackCooldown;
         //this.body.velocity.normalize().scale(attackSpeed);
+        if(this.orientation == Orientation.LEFT ||
+           this.orientation == Orientation.RIGHT ) {
+          attackAnim = Graphics.player.animations.slash.key;
+        } else if (this.orientation == Orientation.DOWN) {
+          attackAnim = Graphics.player.animations.slashDown.key;
+        } else if (this.orientation == Orientation.UP) {
+          attackAnim = Graphics.player.animations.slashUp.key;
+        }
         this.sprite.anims.play(attackAnim, true);
         this.shoot();
         //this.emitter.start();
