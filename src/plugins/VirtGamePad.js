@@ -22,6 +22,7 @@ var VirtGamePad = function (scene)
     //  The Scene that owns this plugin
     console.log('VirtGamePad owned by scene ' + scene.scene.key );
     this.scene = scene;
+    this.scene.input.addPointer(3);
     this.systems = scene.sys;
     this.name = "VirtGamePad";
 
