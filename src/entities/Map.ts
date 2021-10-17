@@ -10,8 +10,9 @@ export default class Map {
   public readonly width: number;
   public readonly height: number;
   public readonly tilemap: Phaser.Tilemaps.Tilemap;
-  public readonly wallLayer: Phaser.Tilemaps.StaticTilemapLayer;
-  public readonly doorLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+  public readonly wallLayer: Phaser.Tilemaps.TilemapLayer;
+  public readonly doorLayer: Phaser.Tilemaps.TilemapLayer;
+  public readonly groundLayer: Phaser.Tilemaps.TilemapLayer;
 
   public readonly startingX: number;
   public readonly startingY: number;
@@ -75,9 +76,10 @@ export default class Map {
       Graphics.environment.spacing
     );
 
-    const groundLayer = this.tilemap
-      .createBlankDynamicLayer("Ground", dungeonTiles, 0, 0)
-      .randomize(
+    this.groundLayer = this.tilemap
+      .createBlankLayer("Ground", dungeonTiles, 0, 0);
+    this.groundLayer.setDepth(1);
+    this.groundLayer.randomize(
         0,
         0,
         this.width,
@@ -88,7 +90,7 @@ export default class Map {
     this.slimes = [];
 
     for (let room of dungeon.rooms) {
-      groundLayer.randomize(
+      this.groundLayer.randomize(
         room.x - 1,
         room.y - 1,
         room.width + 2,
@@ -116,16 +118,16 @@ export default class Map {
         );
       }
     }
-    this.tilemap.convertLayerToStatic(groundLayer).setDepth(1);
+    this.groundLayer.setDepth(1);
 
-    const wallLayer = this.tilemap.createBlankDynamicLayer(
+    this.wallLayer = this.tilemap.createBlankLayer(
       "Wall",
       dungeonTiles,
       0,
       0
     );
 
-    this.doorLayer = this.tilemap.createBlankDynamicLayer(
+    this.doorLayer = this.tilemap.createBlankLayer(
       "Door",
       dungeonTiles,
       0,
@@ -136,13 +138,13 @@ export default class Map {
       for (let y = 0; y < height; y++) {
         const tile = this.tiles[y][x];
         if (tile.type === TileType.Wall) {
-          wallLayer.putTileAt(tile.spriteIndex(), x, y);
+          this.wallLayer.putTileAt(tile.spriteIndex(), x, y);
         } else if (tile.type === TileType.Door) {
           this.doorLayer.putTileAt(tile.spriteIndex(), x, y);
         }
       }
     }
-    wallLayer.setCollisionBetween(0, 0x7f);
+    this.wallLayer.setCollisionBetween(0, 0x7f);
     const collidableDoors = [
       Graphics.environment.indices.doors.horizontal,
       Graphics.environment.indices.doors.vertical
@@ -172,7 +174,6 @@ export default class Map {
     );
     this.doorLayer.setDepth(3);
 
-    this.wallLayer = this.tilemap.convertLayerToStatic(wallLayer);
     this.wallLayer.setDepth(2);
   }
 

@@ -5,6 +5,10 @@ import RogueItems from "../../assets/fongoose/RogueItems16x16.png";
 import HeartFile from "../../assets/fongoose/heart48.png";
 import EmptyHeartFile from "../../assets/fongoose/empty_heart48.png";
 import BulletFile from "../../assets/fongoose/bullet.png";
+import GamePadFileBtnUp from "../../assets/gamepad/btn_up.png"
+import GamePadFileBtnDown from "../../assets/gamepad/btn_down.png"
+import GamePadFilePadOut from "../../assets/gamepad/gamepad_out.png"
+import GamePadFilePadIn from "../../assets/gamepad/gamepad_in.png"
 
 import Util from "../../assets/Util.png";
 
@@ -216,6 +220,15 @@ const util = {
   }
 };
 
+const gamepadUI = {
+  width: 100,
+  height: 100,
+  BtnUp: { name:"gamepadUI_BtnUp",   file: GamePadFileBtnUp } ,
+  BtnDown: { name:"gamepadUI_BtnDown",   file: GamePadFileBtnDown } ,
+  PadOut: { name:"gamepadUI_PadOut",   file: GamePadFilePadOut } ,
+  PadIn: { name:"gamepadUI_PadIn",   file: GamePadFilePadIn }
+};
+
 export default {
   environment,
   player,
@@ -224,5 +237,6 @@ export default {
   heart,
   empty_heart,
   bullet,
-  util
+  util,
+  gamepadUI
 };
