@@ -205,7 +205,9 @@ export default class DungeonScene extends Phaser.Scene {
 
 
     this.scene.run("StatScene");
-    this.scene.run("MobileUI");
+    if (!this.sys.game.device.os.desktop) {
+      this.scene.run("MobileUI");
+    }
   }
 
   playerdie() : void {
