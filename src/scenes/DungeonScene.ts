@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import Graphics from "../assets/Graphics";
+import Sounds from "../assets/Sounds";
 import FOVLayer from "../entities/FOVLayer";
 import Player from "../entities/Player";
 import Slime from "../entities/Slime";
@@ -24,10 +25,24 @@ export default class DungeonScene extends Phaser.Scene {
   tilemap: Phaser.Tilemaps.Tilemap | null;
   map: Map | null;
   roomDebugGraphics?: Phaser.GameObjects.Graphics;
+  music: Phaser.Sound.HTML5AudioSound | null;
+  effects : { [id: string] : Phaser.Sound.HTML5AudioSound};
 
 
 
   preload(): void {
+    var progressBar = this.add.graphics();
+    var progressBox = this.add.graphics();
+    progressBox.fillStyle(0x222222, 0.8);
+    progressBox.fillRect(140, 270, 320, 50);
+
+    this.load.on('progress', function (value) {
+        console.log(value);
+        progressBar.clear();
+        progressBar.fillStyle(0xffffff, 1);
+        progressBar.fillRect(150, 280, 300 * value, 30);
+    });
+
     this.load.image(Graphics.environment.name, Graphics.environment.file);
     this.load.image(Graphics.util.name, Graphics.util.file);
     this.load.image(Graphics.bullet.name, Graphics.bullet.file);
@@ -40,6 +55,10 @@ export default class DungeonScene extends Phaser.Scene {
       frameHeight: Graphics.slime.height,
       frameWidth: Graphics.slime.width
     });
+    this.load.audio(Sounds.MusicLvl_1.name, Sounds.MusicLvl_1.file);
+    this.load.audio(Sounds.WoodDebris.name, Sounds.WoodDebris.file);
+    this.load.audio(Sounds.ShotgunShot.name, Sounds.ShotgunShot.file);
+
   }
 
   constructor() {
@@ -52,6 +71,8 @@ export default class DungeonScene extends Phaser.Scene {
     this.slimes = [];
     this.slimeGroup = null;
     this.map = null;
+    this.music = null;
+    this.effects = {};
   }
 
   slimePlayerCollide(
@@ -94,6 +115,14 @@ export default class DungeonScene extends Phaser.Scene {
         });
       }
     });
+
+    /* Audio */
+    this.music = this.sound.add(Sounds.MusicLvl_1.name);
+    this.effects["WoodDebris"] = this.sound.add(Sounds.WoodDebris.name);
+    this.effects["ShotgunShot"] = this.sound.add(Sounds.ShotgunShot.name);
+    this.music.play({loop: true});
+    //this.effects["WoodDebris"].play();
+
 
     // TODO
     Object.values(Graphics.slime.animations).forEach(anim => {

@@ -10,7 +10,7 @@ const heathbar_posy = 50;
 const guesswords_posx = 200;
 const guesswords_posy = 32;
 
-const guesswords = "JarDinEdenKit";
+const guesswords = "bit.ly/3kUiT7K";
 
 export default class StatScene extends Phaser.Scene {
   healthbar: HealthBar | null;

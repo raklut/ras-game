@@ -167,6 +167,7 @@ export default class Map {
             );
             this.tileAt(tile.x, tile.y)!.open();
             scene.fov!.recalculate();
+            scene.effects["WoodDebris"].play();
           }
         }
       },

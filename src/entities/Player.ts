@@ -186,6 +186,7 @@ export default class Player {
 
   shoot(): void{
     const bullet = new Bullet(this.scene, this, this.orientation);
+    this.scene.effects["ShotgunShot"].play();
   }
 
   update(time: number) {
