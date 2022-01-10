@@ -5,6 +5,7 @@ import RogueItems from "../../assets/fongoose/RogueItems16x16.png";
 import HeartFile from "../../assets/fongoose/heart48.png";
 import EmptyHeartFile from "../../assets/fongoose/empty_heart48.png";
 import BulletFile from "../../assets/fongoose/bullet.png";
+import MedkitFile from "../../assets/fongoose/medkit.png";
 import GamePadFileBtnUp from "../../assets/gamepad/btn_up.png"
 import GamePadFileBtnDown from "../../assets/gamepad/btn_down.png"
 import GamePadFilePadOut from "../../assets/gamepad/gamepad_out.png"
@@ -203,6 +204,17 @@ const empty_heart = {
   //}
 };
 
+const medkit = {
+  name: "medkit",
+  width: 48,
+  height: 48,
+  file: MedkitFile
+  //,
+  //indices: {
+  //  full: 0x00
+  //}
+};
+
 const items = {
   name: "items",
   width: 16,
@@ -234,6 +246,7 @@ export default {
   player,
   slime,
   items,
+  medkit,
   heart,
   empty_heart,
   bullet,

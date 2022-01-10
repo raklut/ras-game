@@ -7,7 +7,7 @@ import Slime from "../entities/Slime";
 import Map from "../entities/Map";
 import eventsCenter from "../entities/EventsCenter"
 import Bullet from "../entities/Bullet"
-
+import Medkit from "../entities/Medkit"
 
 const worldTileHeight = 81;
 const worldTileWidth = 81;
@@ -46,6 +46,7 @@ export default class DungeonScene extends Phaser.Scene {
     this.load.image(Graphics.environment.name, Graphics.environment.file);
     this.load.image(Graphics.util.name, Graphics.util.file);
     this.load.image(Graphics.bullet.name, Graphics.bullet.file);
+    this.load.image(Graphics.medkit.name, Graphics.medkit.file);
     
     this.load.spritesheet(Graphics.player.name, Graphics.player.file, {
       frameHeight: Graphics.player.height,
@@ -149,6 +150,13 @@ export default class DungeonScene extends Phaser.Scene {
       this
     );
 
+    new Medkit(
+      this,
+      this.tilemap.tileToWorldX(map.startingX+2),
+      this.tilemap.tileToWorldY(map.startingY+2)
+    );
+
+
     this.slimes = map.slimes;
     this.slimeGroup = this.physics.add.group(this.slimes.map(s => s.sprite));
 
@@ -187,13 +195,12 @@ export default class DungeonScene extends Phaser.Scene {
     //   this.physics.add.collider(slime.sprite, map.wallLayer);
     // }
 
-    this.input.keyboard.on("keydown-R", function(event) {
-      //this.scene.stop("InfoScene");
-      //this.scene.run("ReferenceScene");
-      //this.scene.sleep();
+    this.input.keyboard.on("keydown-M", function(event) {
+      this.music.stop();
     }, this);
 
     this.input.keyboard.on("keydown-Q", function(event) {
+    //  this.scene.run("VideoPlayerScene");
     //  this.physics.world.drawDebug = !this.physics.world.drawDebug;
     //  if (!this.physics.world.debugGraphic) {
     //    this.physics.world.createDebugGraphic();

@@ -6,6 +6,9 @@ import StatScene from "./scenes/StatScene";
 import MobileUI from "./scenes/MobileUI";
 import GameOverScene from "./scenes/GameOverScene"
 import VirtGamePad from "./plugins/VirtGamePad"
+import VideoPlayerScene from "./scenes/VideoPlayerScene";
+import YoutubePlayerPlugin from 'phaser3-rex-plugins/plugins/youtubeplayer-plugin.js';
+
 
 var config = {
   type: Phaser.WEBGL,
@@ -14,15 +17,24 @@ var config = {
   render: { pixelArt: true },
   physics: { default: "arcade", arcade: { debug: false, gravity: { y: 0 } } },
   scene: [DungeonScene, InfoScene, ReferenceScene, StatScene,
-           MobileUI ,
+           MobileUI , VideoPlayerScene,
            GameOverScene],
   scale: {
     mode: Phaser.Scale.RESIZE
   }
+  parent: "phaser-content",
+  dom: {
+      createContainer: true
+  },
   plugins: {
 //  //   global: [{ key: "SceneWatcher", plugin: SceneWatcherPlugin, start: true }]
 //       global: [{ key: "VirtualGamepad", plugin: VirtualGamepad, start: true }]
 //       scene: [{ key: "VirtGamePad", plugin: VirtGamePad, mapping:"gamepad"}]
+        global: [{
+            key: 'rexYoutubePlayer',
+            plugin: YoutubePlayerPlugin,
+            start: true
+        },
    }
 };
 

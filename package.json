@@ -18,7 +18,7 @@
     "phaser": "^3.55.2",
     "phaser-plugin-scene-watcher": "^4.0.0",
     "phaser-plugin-virtual-gamepad": "^1.0.0",
-    "phaser3-rex-plugins": "^1.1.61",
+    "phaser3-rex-plugins": "^1.1.65",
     "typescript": "^3.7.4"
   }
 }
