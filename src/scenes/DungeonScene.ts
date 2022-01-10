@@ -121,7 +121,7 @@ export default class DungeonScene extends Phaser.Scene {
     this.music = this.sound.add(Sounds.MusicLvl_1.name);
     this.effects["WoodDebris"] = this.sound.add(Sounds.WoodDebris.name);
     this.effects["ShotgunShot"] = this.sound.add(Sounds.ShotgunShot.name);
-    this.music.play({loop: true});
+    //this.music.play({loop: true});
     //this.effects["WoodDebris"].play();
 
 

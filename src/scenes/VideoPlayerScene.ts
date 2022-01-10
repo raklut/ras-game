@@ -45,8 +45,7 @@ export default class VideoPlayerScene extends Phaser.Scene {
     //this.add.existing(this.youtubePlayer);
     //this.youtubePlayer.load(this.vidID, false);
     this.youtubePlayer.play();
-    this.scene.get("DungeonScene").pause();
-    //this.scene.pause("DungeonScene");
+    this.scene.pause("DungeonScene");
   }
 
 
@@ -60,7 +59,7 @@ export default class VideoPlayerScene extends Phaser.Scene {
         console.log("Player status : " + this.youtubePlayer.videoState );
         if(this.youtubePlayer.videoState == 0) {
           console.log("stopping player !");
-          this.scene.resume("DungeonScene")
+          this.scene.resume("DungeonScene");
           this.scene.stop();
         }
       }
